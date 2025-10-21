@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>داشبۆردی WAREDAT2023 | WAREDAT2023 Dashboard</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .header-section {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+        
+        .card {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: none;
+            border-radius: 10px;
+        }
+        
+        .btn-custom {
+            border-radius: 25px;
+            padding: 0.5rem 1.5rem;
+        }
+        
+        .table-container {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .search-section {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        }
+        
+        .alert-custom {
+            border-radius: 10px;
+            border: none;
+        }
+        
+        .table th {
+            background-color: #f8f9fa;
+            border-top: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .table td {
+            vertical-align: middle;
+            font-size: 0.85rem;
+        }
+        
+        .btn-info-custom {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.8rem;
+        }
+        
+        .tabs-nav {
+            background: white;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Auto-fit for name column */
+        .name-column {
+            white-space: nowrap;
+            min-width: 150px;
+            max-width: 250px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        /* Ensure table cells don't wrap */
+        .table td.no-wrap {
+            white-space: nowrap;
+        }
+        
+        @media (max-width: 768px) {
+            .table-responsive {
+                font-size: 0.75rem;
+            }
+            
+            .name-column {
+                min-width: 120px;
+                max-width: 180px;
+            }
+        }
+    </style>
+</head>
+<body>
+    
+    <!-- Header Section -->
+    <div class="header-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="display-6 mb-0">
+                        <i class="bi bi-box-seam me-3"></i>
+                        داشبۆردی کاڵاکان WAREDAT2023
+                    </h1>
+                    <p class="mb-0 mt-2">Warehouse Data Management Dashboard</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <button id="refreshBtn" class="btn btn-light btn-custom me-2">
+                        <i class="bi bi-arrow-clockwise"></i> نوێکردنەوە
+                    </button>
+                    <button id="exportBtn" class="btn btn-warning btn-custom">
+                        <i class="bi bi-file-earmark-pdf"></i> PDF ڕاپۆرت
+                    </button>
+                    <button id="printFilteredBtn" class="btn btn-info btn-custom">
+                        <i class="bi bi-printer"></i> پرینتی فلتەرکراوەکان
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        
+        <!-- Navigation Tabs -->
+        <div class="tabs-nav">
+            <ul class="nav nav-pills justify-content-center">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">
+                        <i class="bi bi-people me-2"></i>کەسانەکان | Persons
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="/views/waredat2023.html">
+                        <i class="bi bi-box-seam me-2"></i>کاڵاکان | Warehouse 2023
+                    </a>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- Search and Filter Section -->
+        <div class="search-section">
+            <h5 class="mb-3">
+                <i class="bi bi-search me-2"></i>
+                گەڕان و فیلتەرکردن | Search & Filter
+            </h5>
+            
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label for="searchLogo" class="form-label">لۆگۆ | Logo</label>
+                    <input type="text" class="form-control" id="searchLogo" placeholder="لۆگۆ...">
+                </div>
+                <div class="col-md-3">
+                    <label for="searchTrackNumber" class="form-label">تراک نامبر | Track Number</label>
+                    <input type="text" class="form-control" id="searchTrackNumber" placeholder="تراک نامبر...">
+                </div>
+                <div class="col-md-3">
+                    <label for="searchFax" class="form-label">فاکس | Fax</label>
+                    <input type="text" class="form-control" id="searchFax" placeholder="فاکس...">
+                </div>
+                <div class="col-md-3">
+                    <label for="searchDestination" class="form-label">مقصد بار | Destination</label>
+                    <input type="text" class="form-control" id="searchDestination" placeholder="مقصد بار...">
+                </div>
+            </div>
+            
+            <div class="row g-3 mt-2">
+                <div class="col-md-3">
+                    <label for="searchItemType" class="form-label">جۆری شمەک | Item Type</label>
+                    <input type="text" class="form-control" id="searchItemType" placeholder="جۆری شمەک...">
+                </div>
+                <div class="col-md-3">
+                    <label for="searchNaw" class="form-label">ناو | Name</label>
+                    <input type="text" class="form-control" id="searchNaw" placeholder="ناوی کاڵا...">
+                </div>
+                <div class="col-md-3">
+                    <label for="searchWeight" class="form-label">وزن | Weight</label>
+                    <input type="text" class="form-control" id="searchWeight" placeholder="وزن...">
+                </div>
+                <div class="col-md-3">
+                    <label for="searchStatus" class="form-label">حاڵەت | Status</label>
+                    <input type="text" class="form-control" id="searchStatus" placeholder="حاڵەت...">
+                </div>
+            </div>
+            
+            <div class="row mt-3">
+                <div class="col-12">
+                    <button id="searchBtn" class="btn btn-primary btn-custom me-2">
+                        <i class="bi bi-search"></i> گەڕان
+                    </button>
+                    <button id="clearBtn" class="btn btn-outline-secondary btn-custom">
+                        <i class="bi bi-x-circle"></i> پاککردنەوە
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="bi bi-box text-success" style="font-size: 2rem;"></i>
+                        <h4 class="mt-2 mb-0" id="totalCount">0</h4>
+                        <p class="text-muted mb-0">کۆی گشتی | Total Records</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="bi bi-funnel text-info" style="font-size: 2rem;"></i>
+                        <h4 class="mt-2 mb-0" id="filteredCount">0</h4>
+                        <p class="text-muted mb-0">ئەنجامی فیلتەر | Filtered Results</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="bi bi-clock text-warning" style="font-size: 2rem;"></i>
+                        <h4 class="mt-2 mb-0" id="lastUpdate">--:--</h4>
+                        <p class="text-muted mb-0">نوێکردنەوەی دوایین | Last Update</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Spinner -->
+        <div class="loading" id="loadingSpinner">
+            <div class="spinner-border text-success" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">بارکردنی داتا... | Loading data...</p>
+        </div>
+
+        <!-- Error Alert -->
+        <div class="alert alert-danger alert-custom d-none" id="errorAlert">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            <span id="errorMessage"></span>
+        </div>
+
+        <!-- Success Alert -->
+        <div class="alert alert-success alert-custom d-none" id="successAlert">
+            <i class="bi bi-check-circle me-2"></i>
+            <span id="successMessage"></span>
+        </div>
+
+        <!-- Data Table -->
+        <div class="table-container">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="mb-0">
+                    <i class="bi bi-table me-2"></i>
+                    لیستی کاڵاکان | Warehouse Items List
+                </h5>
+                <div class="d-flex align-items-center gap-3">
+                    <small class="text-muted" id="recordInfo">0 ڕیز نیشان دراوە</small>
+                    <select class="form-select form-select-sm" id="recordsPerPage" style="width: auto;">
+                        <option value="10">10 ڕیز</option>
+                        <option value="25" selected>25 ڕیز</option>
+                        <option value="50">50 ڕیز</option>
+                        <option value="100">100 ڕیز</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table table-hover table-sm" id="warehouseTable">
+                    <thead>
+                        <tr id="tableHeader">
+                            <!-- Headers will be populated dynamically -->
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <!-- Data will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Pagination Controls -->
+            <div class="d-flex justify-content-between align-items-center mt-4">
+                <div class="pagination-info">
+                    <span id="paginationInfo" class="text-muted">لاپەڕە 1 لە 1</span>
+                </div>
+                <nav aria-label="Page navigation">
+                    <ul class="pagination pagination-sm mb-0" id="paginationControls">
+                        <!-- Pagination buttons will be generated here -->
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Info Modal -->
+    <div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="infoModalLabel">
+                        <i class="bi bi-info-circle me-2"></i>
+                        زانیاری تەواوی کاڵا | Complete Item Information
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="modalBody">
+                    <!-- Item details will be populated here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">داخستن | Close</button>
+                    <button type="button" class="btn btn-success" id="printItemBtn">
+                        <i class="bi bi-printer me-2"></i>پرینتی ئەم بابەتە | Print This Item
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Global variables
+        let currentData = [];
+        let currentPagination = {};
+        let currentPage = 1;
+        let recordsPerPage = 25;
+        let isSearchMode = false;
+        let selectedItemData = null;
+
+        // DOM elements
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const errorAlert = document.getElementById('errorAlert');
+        const successAlert = document.getElementById('successAlert');
+        const tableBody = document.getElementById('tableBody');
+        const tableHeader = document.getElementById('tableHeader');
+        const totalCountEl = document.getElementById('totalCount');
+        const filteredCountEl = document.getElementById('filteredCount');
+        const lastUpdateEl = document.getElementById('lastUpdate');
+        const recordInfoEl = document.getElementById('recordInfo');
+        const paginationInfo = document.getElementById('paginationInfo');
+        const paginationControls = document.getElementById('paginationControls');
+        const recordsPerPageSelect = document.getElementById('recordsPerPage');
+        const infoModal = new bootstrap.Modal(document.getElementById('infoModal'));
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            loadWarehouseData(1);
+            setupEventListeners();
+        });
+
+        // Event listeners
+        function setupEventListeners() {
+            document.getElementById('refreshBtn').addEventListener('click', () => loadWarehouseData(1));
+            document.getElementById('searchBtn').addEventListener('click', performSearch);
+            document.getElementById('clearBtn').addEventListener('click', clearSearch);
+            document.getElementById('exportBtn').addEventListener('click', exportToPDF);
+            document.getElementById('printFilteredBtn').addEventListener('click', printFilteredData);
+            document.getElementById('printItemBtn').addEventListener('click', printSelectedItem);
+            recordsPerPageSelect.addEventListener('change', handleRecordsPerPageChange);
+            
+            // Real-time search on input
+            document.getElementById('searchLogo').addEventListener('input', debounce(performSearch, 500));
+            document.getElementById('searchTrackNumber').addEventListener('input', debounce(performSearch, 500));
+            document.getElementById('searchFax').addEventListener('input', debounce(performSearch, 500));
+            document.getElementById('searchDestination').addEventListener('input', debounce(performSearch, 500));
+            document.getElementById('searchItemType').addEventListener('input', debounce(performSearch, 500));
+            document.getElementById('searchNaw').addEventListener('input', debounce(performSearch, 500));
+            document.getElementById('searchWeight').addEventListener('input', debounce(performSearch, 500));
+            document.getElementById('searchStatus').addEventListener('input', debounce(performSearch, 500));
+        }
+
+        // Debounce function for real-time search
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Load warehouse data from API with pagination
+        async function loadWarehouseData(page = 1) {
+            currentPage = page;
+            isSearchMode = false;
+            showLoading(true);
+            hideAlerts();
+            
+            try {
+                const response = await fetch(`/api/waredat2023?page=${page}&limit=${recordsPerPage}`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    currentData = result.data;
+                    currentPagination = result.pagination;
+                    populateTable(currentData);
+                    updatePagination();
+                    updateStatistics();
+                    showSuccess('داتاکان بە سەرکەوتووی بارکران | Data loaded successfully');
+                } else {
+                    showError('هەڵەی بارکردنی داتا | Error loading data: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showError('هەڵەی پەیوەندی بە سێرڤەر | Server connection error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Perform search and filtering with pagination
+        async function performSearch(page = 1) {
+            const logo = document.getElementById('searchLogo').value.trim();
+            const trackNumber = document.getElementById('searchTrackNumber').value.trim();
+            const fax = document.getElementById('searchFax').value.trim();
+            const destination = document.getElementById('searchDestination').value.trim();
+            const itemType = document.getElementById('searchItemType').value.trim();
+            const naw = document.getElementById('searchNaw').value.trim();
+            const weight = document.getElementById('searchWeight').value.trim();
+            const status = document.getElementById('searchStatus').value.trim();
+            
+            // Check if any search field has value
+            const hasSearchTerms = logo || trackNumber || fax || destination || itemType || naw || weight || status;
+            
+            // If no search terms, load normal data
+            if (!hasSearchTerms) {
+                loadWarehouseData(page);
+                return;
+            }
+            
+            currentPage = page;
+            isSearchMode = true;
+            showLoading(true);
+            
+            try {
+                const params = new URLSearchParams();
+                if (logo) params.append('logo', logo);
+                if (trackNumber) params.append('trackNumber', trackNumber);
+                if (fax) params.append('fax', fax);
+                if (destination) params.append('destination', destination);
+                if (itemType) params.append('itemType', itemType);
+                if (naw) params.append('naw', naw);
+                if (weight) params.append('weight', weight);
+                if (status) params.append('status', status);
+                params.append('page', page);
+                params.append('limit', recordsPerPage);
+                
+                const response = await fetch(`/api/waredat2023/search?${params.toString()}`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    currentData = result.data;
+                    currentPagination = result.pagination;
+                    populateTable(currentData);
+                    updatePagination();
+                    updateStatistics();
+                    
+                    if (currentData.length === 0) {
+                        showError('هیچ ئەنجامێک نەدۆزرایەوە | No results found');
+                    }
+                } else {
+                    showError('هەڵەی گەڕان | Search error: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Search error:', error);
+                showError('هەڵەی گەڕان | Search error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Clear search filters
+        function clearSearch() {
+            document.getElementById('searchLogo').value = '';
+            document.getElementById('searchTrackNumber').value = '';
+            document.getElementById('searchFax').value = '';
+            document.getElementById('searchDestination').value = '';
+            document.getElementById('searchItemType').value = '';
+            document.getElementById('searchNaw').value = '';
+            document.getElementById('searchWeight').value = '';
+            document.getElementById('searchStatus').value = '';
+            
+            loadWarehouseData(1);
+            hideAlerts();
+        }
+
+        // Perform search based on header inputs
+        async function performHeaderSearch(page = 1) {
+            const searchInputs = document.querySelectorAll('[id^="headerSearch_"]');
+            const searchParams = {};
+            let hasSearchTerms = false;
+            
+            searchInputs.forEach(input => {
+                const value = input.value.trim();
+                const column = input.dataset.column;
+                if (value) {
+                    searchParams[column] = value;
+                    hasSearchTerms = true;
+                }
+            });
+            
+            if (!hasSearchTerms) {
+                loadWarehouseData(page);
+                return;
+            }
+            
+            currentPage = page;
+            isSearchMode = true;
+            showLoading(true);
+            
+            try {
+                const params = new URLSearchParams();
+                Object.keys(searchParams).forEach(key => {
+                    params.append(key, searchParams[key]);
+                });
+                params.append('page', page);
+                params.append('limit', recordsPerPage);
+                
+                const response = await fetch(`/api/waredat2023/headersearch?${params.toString()}`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    currentData = result.data;
+                    currentPagination = result.pagination;
+                    populateTable(currentData);
+                    updatePagination();
+                    showAlert(`${result.pagination.totalRecords} ئەنجام دۆزرایەوە`, 'info');
+                } else {
+                    throw new Error(result.error || 'گەڕان سەرکەوتوو نەبوو');
+                }
+            } catch (error) {
+                console.error('Header search error:', error);
+                showAlert('هەڵەی گەڕان: ' + error.message, 'danger');
+                populateTable([]);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Populate table with data
+        function populateTable(data) {
+            // Clear existing content
+            tableHeader.innerHTML = '';
+            tableBody.innerHTML = '';
+            
+            if (data.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="100%" class="text-center py-4">
+                            <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+                            <p class="text-muted mt-2 mb-0">هیچ داتایەک نیە | No data available</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            // Create table headers with search inputs
+            const headers = Object.keys(data[0]);
+            headers.forEach((header, index) => {
+                const th = document.createElement('th');
+                th.style.fontSize = '0.8rem';
+                th.style.padding = '5px';
+                th.style.verticalAlign = 'top';
+                
+                // Header text
+                const headerText = document.createElement('div');
+                headerText.textContent = header;
+                headerText.style.fontWeight = 'bold';
+                headerText.style.marginBottom = '5px';
+                
+                // Search input for this column
+                const searchInput = document.createElement('input');
+                searchInput.type = 'text';
+                searchInput.className = 'form-control form-control-sm';
+                searchInput.placeholder = `گەڕان لە ${header}...`;
+                searchInput.style.fontSize = '0.7rem';
+                searchInput.id = `headerSearch_${index}`;
+                searchInput.dataset.column = header;
+                
+                // Add real-time search event
+                searchInput.addEventListener('input', debounce(() => {
+                    performHeaderSearch();
+                }, 500));
+                
+                th.appendChild(headerText);
+                th.appendChild(searchInput);
+                tableHeader.appendChild(th);
+            });
+            
+            // Add action column
+            const actionTh = document.createElement('th');
+            actionTh.textContent = 'کردارەکان | Actions';
+            actionTh.style.fontSize = '0.8rem';
+            tableHeader.appendChild(actionTh);
+            
+            // Create table rows
+            data.forEach((item, index) => {
+                const row = document.createElement('tr');
+                headers.forEach(header => {
+                    const td = document.createElement('td');
+                    td.textContent = item[header] || '';
+                    
+                    // Add special styling for name column (ناو)
+                    if (header === 'ناو' || header === 'Naw') {
+                        td.className = 'name-column text-right';
+                    }
+                    // Add text-right class for مارکە column
+                    else if (header === 'مارکە' || header === 'Logo') {
+                        td.className = 'text-right';
+                    }
+                    
+                    row.appendChild(td);
+                });
+                
+                // Add info button
+                const actionTd = document.createElement('td');
+                actionTd.innerHTML = `
+                    <button class="btn btn-outline-info btn-sm btn-info-custom" onclick="showItemInfo(${index})">
+                        <i class="bi bi-info-circle"></i> زانیاری
+                    </button>
+                `;
+                row.appendChild(actionTd);
+                
+                tableBody.appendChild(row);
+            });
+            
+            // Update record info
+            const totalRecords = currentPagination.totalRecords || data.length;
+            recordInfoEl.textContent = `${data.length} ڕیز نیشان دراوە لە ${totalRecords} | ${data.length} of ${totalRecords} records shown`;
+        }
+
+        // Show item information in modal
+        function showItemInfo(index) {
+            selectedItemData = currentData[index];
+            const modalBody = document.getElementById('modalBody');
+            
+            let modalContent = '<div class="row">';
+            Object.entries(selectedItemData).forEach(([key, value]) => {
+                modalContent += `
+                    <div class="col-md-6 mb-3">
+                        <div class="card">
+                            <div class="card-body p-3">
+                                <h6 class="card-title text-success mb-1">${key}</h6>
+                                <p class="card-text mb-0">${value || 'N/A'}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            modalContent += '</div>';
+            
+            modalBody.innerHTML = modalContent;
+            infoModal.show();
+        }
+
+        // Print selected item
+        function printSelectedItem() {
+            if (!selectedItemData) return;
+            
+            // Create printable content
+            let printContent = `
+                <div style="font-family: Arial, sans-serif; margin: 20px;">
+                    <h2 style="text-align: center; color: #28a745;">زانیاری کاڵا | Item Information</h2>
+                    <hr>
+                    <table style="width: 100%; border-collapse: collapse;">
+            `;
+            
+            Object.entries(selectedItemData).forEach(([key, value]) => {
+                printContent += `
+                    <tr style="border-bottom: 1px solid #ddd;">
+                        <td style="padding: 10px; font-weight: bold; background-color: #f8f9fa;">${key}</td>
+                        <td style="padding: 10px;">${value || 'N/A'}</td>
+                    </tr>
+                `;
+            });
+            
+            printContent += `
+                    </table>
+                    <br>
+                    <p style="text-align: center; color: #666;">تاریخ: ${new Date().toLocaleDateString()} | Date: ${new Date().toLocaleDateString()}</p>
+                </div>
+            `;
+            
+            // Open print window
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(printContent);
+            printWindow.document.close();
+            printWindow.print();
+        }
+
+        // Update statistics
+        function updateStatistics() {
+            if (currentPagination.totalRecords !== undefined) {
+                totalCountEl.textContent = currentPagination.totalRecords;
+                filteredCountEl.textContent = currentData.length;
+            }
+            lastUpdateEl.textContent = new Date().toLocaleTimeString();
+        }
+        
+        // Update pagination controls
+        function updatePagination() {
+            if (!currentPagination) return;
+            
+            const { currentPage: page, totalPages, totalRecords, recordsPerPage: perPage } = currentPagination;
+            
+            // Update pagination info
+            const startRecord = ((page - 1) * perPage) + 1;
+            const endRecord = Math.min(page * perPage, totalRecords);
+            paginationInfo.textContent = `لاپەڕە ${page} لە ${totalPages} (${startRecord}-${endRecord} لە ${totalRecords})`;
+            
+            // Generate pagination buttons
+            let paginationHTML = '';
+            
+            // Previous button
+            if (currentPagination.hasPreviousPage) {
+                paginationHTML += `<li class="page-item"><button class="page-link" onclick="changePage(${page - 1})">پێشوو</button></li>`;
+            } else {
+                paginationHTML += `<li class="page-item disabled"><span class="page-link">پێشوو</span></li>`;
+            }
+            
+            // Page numbers
+            let startPage = Math.max(1, page - 2);
+            let endPage = Math.min(totalPages, page + 2);
+            
+            if (startPage > 1) {
+                paginationHTML += `<li class="page-item"><button class="page-link" onclick="changePage(1)">1</button></li>`;
+                if (startPage > 2) {
+                    paginationHTML += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+                }
+            }
+            
+            for (let i = startPage; i <= endPage; i++) {
+                const activeClass = i === page ? 'active' : '';
+                paginationHTML += `<li class="page-item ${activeClass}"><button class="page-link" onclick="changePage(${i})">${i}</button></li>`;
+            }
+            
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    paginationHTML += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+                }
+                paginationHTML += `<li class="page-item"><button class="page-link" onclick="changePage(${totalPages})">${totalPages}</button></li>`;
+            }
+            
+            // Next button
+            if (currentPagination.hasNextPage) {
+                paginationHTML += `<li class="page-item"><button class="page-link" onclick="changePage(${page + 1})">دواتر</button></li>`;
+            } else {
+                paginationHTML += `<li class="page-item disabled"><span class="page-link">دواتر</span></li>`;
+            }
+            
+            paginationControls.innerHTML = paginationHTML;
+        }
+        
+        // Change page function
+        function changePage(page) {
+            if (isSearchMode) {
+                performSearch(page);
+            } else {
+                loadWarehouseData(page);
+            }
+        }
+        
+        // Handle records per page change
+        function handleRecordsPerPageChange() {
+            recordsPerPage = parseInt(recordsPerPageSelect.value);
+            if (isSearchMode) {
+                performSearch(1);
+            } else {
+                loadWarehouseData(1);
+            }
+        }
+
+        // Export to PDF
+        async function exportToPDF() {
+            if (currentData.length === 0) {
+                showError('هیچ داتایەک نیە بۆ هەناردەکردن | No data to export');
+                return;
+            }
+            
+            showLoading(true);
+            
+            try {
+                const response = await fetch('/api/generate-pdf', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ data: currentData })
+                });
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `waredat2023-report-page-${currentPage}-${new Date().toISOString().split('T')[0]}.pdf`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                    
+                    showSuccess('ڕاپۆرت بە سەرکەوتووی دروست کرا | Report generated successfully');
+                } else {
+                    showError('هەڵەی دروستکردنی ڕاپۆرت | Error generating report');
+                }
+            } catch (error) {
+                showError('هەڵەی دروستکردنی PDF | PDF generation error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Print filtered data
+        async function printFilteredData() {
+            if (currentData.length === 0) {
+                showError('هیچ داتایەک نیە بۆ پرینتکردن | No data to print');
+                return;
+            }
+            
+            // Create a new window for printing
+            const printWindow = window.open('', '_blank');
+            
+            // Define columns to show with mapping (added جۆری شمک)
+            const columnsToShow = ['تراک نامبر', 'ناو', 'لۆگۆ', 'جۆری شمک', 'کارتون', 'وزن', 'متر', 'تێبینی', 'فاكس', 'واژوو'];
+            
+            // Column mapping from database to display names
+            const columnMapping = {
+                'تراک نامبر': 'تراک نامبر',
+                'ناو': 'Naw',
+                'لۆگۆ': 'Logo', 
+                'جۆری شمک': 'جوری شمه ک', // Map to database column name
+                'کارتون': 'کارتون',
+                'وزن': 'وزن',
+                'متر': 'متر',
+                'تێبینی': 'تێبینی',
+                'فاكس': 'فاكس',
+                'واژوو': '' // Empty column for signature
+            };
+            
+            // Generate HTML content for printing (LANDSCAPE layout)
+            let printContent = `
+                <!DOCTYPE html>
+                <html dir="rtl" lang="ku">
+                <head>
+                    <title>لیستی تۆمارەکان</title>
+                    <meta charset="UTF-8">
+                    <style>
+                        @page {
+                            size: A4 landscape;
+                            margin: 15mm;
+                        }
+                        body { 
+                            font-family: 'Arial', 'Tahoma', sans-serif; 
+                            margin: 0; 
+                            direction: rtl; 
+                            text-align: right;
+                            font-size: 11px;
+                        }
+                        h1 { 
+                            text-align: center; 
+                            color: #333; 
+                            margin-bottom: 20px; 
+                            font-size: 18px;
+                            border-bottom: 2px solid #007bff;
+                            padding-bottom: 8px;
+                        }
+                        table { 
+                            width: 100%; 
+                            border-collapse: collapse; 
+                            margin: 15px 0; 
+                            direction: rtl;
+                            table-layout: fixed;
+                        }
+                        th, td { 
+                            border: 1px solid #333; 
+                            padding: 4px; 
+                            text-align: center; 
+                            font-size: 9px; 
+                            word-wrap: break-word;
+                        }
+                        th { 
+                            background-color: #f0f0f0; 
+                            font-weight: bold; 
+                            color: #000;
+                            height: 30px;
+                        }
+                        .text-right { 
+                            text-align: right !important; 
+                        }
+                        .name-column { 
+                            text-align: right !important;
+                            width: 12%;
+                        }
+                        .track-column { width: 10%; }
+                        .logo-column { width: 8%; }
+                        .type-column { width: 10%; }
+                        .carton-column { width: 8%; }
+                        .weight-column { width: 8%; }
+                        .meter-column { width: 8%; }
+                        .note-column { width: 15%; }
+                        .fax-column { width: 8%; }
+                        .signature-column { width: 13%; }
+                        
+                        tr:nth-child(even) { 
+                            background-color: #f9f9f9; 
+                        }
+                        .info { 
+                            margin-bottom: 15px; 
+                            text-align: right;
+                            font-size: 10px;
+                        }
+                        .date { 
+                            text-align: left; 
+                            font-style: italic; 
+                            color: #666;
+                        }
+                        @media print {
+                            body { margin: 0; }
+                            .no-print { display: none; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <h1>لیستی تۆمارەکان</h1>
+                    <div class="info">
+                        <p><strong>کۆی گشتی ئەنجامەکان:</strong> ${currentPagination?.totalRecords || currentData.length}</p>
+                        <p><strong>لاپەڕەی ئێستا:</strong> ${currentPage}</p>
+                        <p class="date">بەرواری پرینت: ${new Date().toLocaleDateString('ku')}</p>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+            `;
+            
+            // Add headers (only selected columns with specific CSS classes)
+            columnsToShow.forEach((column, index) => {
+                let columnClass = '';
+                switch(column) {
+                    case 'تراک نامبر': columnClass = 'track-column'; break;
+                    case 'ناو': columnClass = 'name-column'; break;
+                    case 'لۆگۆ': columnClass = 'logo-column'; break;
+                    case 'جۆری شمک': columnClass = 'type-column'; break;
+                    case 'کارتون': columnClass = 'carton-column'; break;
+                    case 'وزن': columnClass = 'weight-column'; break;
+                    case 'متر': columnClass = 'meter-column'; break;
+                    case 'تێبینی': columnClass = 'note-column'; break;
+                    case 'فاكس': columnClass = 'fax-column'; break;
+                    case 'واژوو': columnClass = 'signature-column'; break;
+                }
+                printContent += `<th class="${columnClass}">${column}</th>`;
+            });
+            
+            printContent += `
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            // Add data rows (only selected columns with mapping and CSS classes)
+            currentData.forEach(item => {
+                printContent += '<tr>';
+                columnsToShow.forEach(column => {
+                    const dbColumn = columnMapping[column];
+                    const value = dbColumn ? (item[dbColumn] || '') : ''; // Empty for واژوو column
+                    
+                    // Add CSS class for each column
+                    let columnClass = '';
+                    switch(column) {
+                        case 'تراک نامبر': columnClass = 'track-column'; break;
+                        case 'ناو': columnClass = 'name-column text-right'; break;
+                        case 'لۆگۆ': columnClass = 'logo-column text-right'; break;
+                        case 'جۆری شمک': columnClass = 'type-column'; break;
+                        case 'کارتون': columnClass = 'carton-column'; break;
+                        case 'وزن': columnClass = 'weight-column'; break;
+                        case 'متر': columnClass = 'meter-column'; break;
+                        case 'تێبینی': columnClass = 'note-column text-right'; break;
+                        case 'فاكس': columnClass = 'fax-column'; break;
+                        case 'واژوو': columnClass = 'signature-column'; break;
+                    }
+                    
+                    printContent += `<td class="${columnClass}">${value}</td>`;
+                });
+                printContent += '</tr>';
+            });
+            
+            printContent += `
+                        </tbody>
+                    </table>
+                    <div class="no-print" style="text-align: center; margin-top: 20px;">
+                        <button onclick="window.print()">پرینت</button>
+                        <button onclick="window.close()">داخستن</button>
+                    </div>
+                </body>
+                </html>
+            `;
+            
+            printWindow.document.write(printContent);
+            printWindow.document.close();
+            
+            // Auto print after a short delay
+            setTimeout(() => {
+                printWindow.print();
+            }, 500);
+            
+            showSuccess('پەڕەی پرینت ئامادە کرا | Print page prepared');
+        }
+
+        // Utility functions
+        function showLoading(show) {
+            loadingSpinner.style.display = show ? 'block' : 'none';
+        }
+
+        function showError(message) {
+            document.getElementById('errorMessage').textContent = message;
+            errorAlert.classList.remove('d-none');
+            setTimeout(() => errorAlert.classList.add('d-none'), 5000);
+        }
+
+        function showSuccess(message) {
+            document.getElementById('successMessage').textContent = message;
+            successAlert.classList.remove('d-none');
+            setTimeout(() => successAlert.classList.add('d-none'), 3000);
+        }
+
+        function hideAlerts() {
+            errorAlert.classList.add('d-none');
+            successAlert.classList.add('d-none');
+        }
+    </script>
+
+</body>
+</html>

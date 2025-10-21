@@ -1,0 +1,48 @@
+{
+  "name": "waredat-sql-server-web-app",
+  "version": "1.0.0",
+  "description": "Node.js/Express web application for displaying SQL Server database data - Kurdish/English interface for warehouse management",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "build": "echo \"No build process required for this project\"",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy": "npm run start"
+  },
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=6.0.0"
+  },
+  "keywords": [
+    "nodejs",
+    "express",
+    "sql-server",
+    "web-app",
+    "bootstrap",
+    "kurdish",
+    "warehouse",
+    "data-management",
+    "mssql",
+    "dashboard"
+  ],
+  "author": "Warehouse Management Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/waredat-sql-server-web-app.git"
+  },
+  "homepage": "https://github.com/yourusername/waredat-sql-server-web-app#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "mssql": "^10.0.1",
+    "node-fetch": "^2.7.0",
+    "path": "^0.12.7",
+    "puppeteer": "^21.5.2",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
